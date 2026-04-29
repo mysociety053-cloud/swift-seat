@@ -309,6 +309,7 @@
   let separationRules=[];
   let activeSeatIndex=-1,longPressTimer=null;
   let currentMode='teacher';
+  let studentRevealed=false;
   const STORAGE_KEY='seat_shuffle_classes_v1';
 
   const parseNames=(t)=>t.split('\n').map(s=>s.trim()).filter(Boolean);
@@ -719,8 +720,8 @@
       const num=document.createElement('div');num.style.cssText='font-size:11px;opacity:.55;font-weight:600';num.textContent=(i+1);seat.appendChild(num);
       const main=document.createElement('div');
       if(st==='empty'){main.style.cssText='font-size:12px;opacity:.6';main.textContent='빈자리';}
-      else if(st==='fixed'){main.style.cssText='font-size:16px;font-weight:700;word-break:keep-all;line-height:1.2;margin-top:2px';main.textContent=fn;}
       else if(an){main.style.cssText='font-size:16px;font-weight:700;word-break:keep-all;line-height:1.2;margin-top:2px';main.textContent=an;}
+      else if(st==='fixed'&&studentRevealed){main.style.cssText='font-size:16px;font-weight:700;word-break:keep-all;line-height:1.2;margin-top:2px';main.textContent=fn;}
       else{main.style.cssText='font-size:18px;opacity:.5;margin-top:2px';main.textContent=gd==='boy'?'👦':'👧';}
       seat.appendChild(main);
       studentClassroom.appendChild(seat);
@@ -894,6 +895,7 @@
       bigShuffleBtn.disabled=false;bigShuffleBtn.style.opacity='1';
       if(res.error){studentStatus.innerHTML='⚠ '+res.error;studentStatus.style.color='#dc2626';return;}
       assignedNames=res.assigned;
+      studentRevealed=true;
       let msg=`🎉 자리 배치 완료! 남 ${res.bi}명 · 여 ${res.gi}명`;
       const warns=[];
       if(res.fallbackPair)warns.push('일부 짝 반복');
@@ -1044,6 +1046,7 @@
       studentConfigSummary.appendChild(sp);
     });
     assignedNames=new Array(r*c).fill(null);
+    studentRevealed=false;
     studentStatus.textContent='아래 버튼을 누르면 자리가 정해져요';
     studentStatus.style.color='#6b7280';
     hide(studentAfterActions);
