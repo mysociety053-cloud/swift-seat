@@ -70,7 +70,8 @@
       <div id="class-setting-area" class="ssa-hidden">
         <div id="lock-banner" class="ssa-hidden" style="background:#DBEAFE;border:1px solid #93C5FD;border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#1E3A8A;align-items:center;gap:8px">
           <span style="font-size:16px">🔒</span>
-          <div style="flex:1"><strong style="font-weight:600">기본 세팅 잠김</strong> · 명단·교실·고정·규칙은 수정할 수 없습니다.</div>
+          <div style="flex:1"><strong style="font-weight:600">기본 세팅 잠김</strong> · 수정하려면 오른쪽의 잠금 해제 버튼을 누르세요.</div>
+          <button id="unlock-class-btn" style="padding:7px 14px;font-size:12px;font-weight:500;background:#1E40AF;color:#fff;border:none;border-radius:8px;cursor:pointer">🔓 잠금 해제</button>
         </div>
 
         <div class="ssa-card" style="margin-bottom:16px">
@@ -286,7 +287,7 @@
   const teacherView=$('teacher-view'),studentView=$('student-view'),modeBar=$('mode-bar'),modeIcon=$('mode-icon'),modeLabel=$('mode-label'),activeClassBadge=$('active-class-badge');
   const gotoStudentBtn=$('goto-student-btn'),gotoStudentBtn2=$('goto-student-btn-2'),backToTeacherBtn=$('back-to-teacher-btn');
   const classList=$('class-list'),newClassName=$('new-class-name'),addClassBtn=$('add-class-btn'),classStatus=$('class-status');
-  const noClassHint=$('no-class-hint'),classSettingArea=$('class-setting-area'),lockBanner=$('lock-banner'),lockClassBtn=$('lock-class-btn'),seatUsageHint=$('seat-usage-hint');
+  const noClassHint=$('no-class-hint'),classSettingArea=$('class-setting-area'),lockBanner=$('lock-banner'),lockClassBtn=$('lock-class-btn'),unlockClassBtn=$('unlock-class-btn'),seatUsageHint=$('seat-usage-hint');
   const rowsInput=$('rows'),colsInput=$('cols'),rowsOut=$('rows-out'),colsOut=$('cols-out');
   const boysTa=$('boys'),girlsTa=$('girls'),boysCount=$('boys-count'),girlsCount=$('girls-count'),nameWarning=$('name-warning');
   const classroom=$('classroom'),status=$('status'),statTotal=$('stat-total'),statBoySeats=$('stat-boy-seats'),statGirlSeats=$('stat-girl-seats'),statFixed=$('stat-fixed'),statEmpty=$('stat-empty');
@@ -451,6 +452,17 @@
     setStatus(`'${cls.name}' 잠금 저장 완료.`,'success');
     renderClassList();
     activeClassBadge.textContent=cls.name+' 🔒';
+    updateLockUI();
+  }
+  function unlockActiveClass(){
+    const cls=getActiveClass();if(!cls)return;
+    if(!cls.locked){setStatus('이미 편집 가능한 학급입니다.','warning');return;}
+    if(!confirm(`'${cls.name}' 학급의 잠금을 해제하시겠습니까?\n\n해제 후 명단·교실·고정·규칙을 수정할 수 있습니다.\n수정한 뒤에는 다시 '🔒 잠그고 저장' 버튼으로 저장하세요.`))return;
+    cls.locked=false;cls.lockedAt=null;
+    persistClasses();
+    setStatus(`'${cls.name}' 잠금 해제됨. 수정 후 다시 저장하세요.`,'success');
+    renderClassList();
+    activeClassBadge.textContent=cls.name;
     updateLockUI();
   }
   function updateLockUI(){
@@ -1107,6 +1119,7 @@
   addClassBtn.addEventListener('click',addClass);
   newClassName.addEventListener('keydown',(e)=>{if(e.key==='Enter'){e.preventDefault();addClass();}});
   lockClassBtn.addEventListener('click',lockActiveClass);
+  unlockClassBtn.addEventListener('click',unlockActiveClass);
 
   document.addEventListener('click',(e)=>{
     if(!ctxMenu.classList.contains('ssa-hidden')&&!ctxMenu.contains(e.target)&&!classroom.contains(e.target))closeContextMenu();
