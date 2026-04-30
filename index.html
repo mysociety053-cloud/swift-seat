@@ -391,7 +391,13 @@
       const studentTotal=parseNames(cls.boys||'').length+parseNames(cls.girls||'').length;
       meta.textContent=`${cls.rows||'?'}×${cls.cols||'?'} · 학생 ${studentTotal}명 · 회차 ${(cls.history||[]).length}개`;
       nameWrap.appendChild(nameEl);nameWrap.appendChild(meta);
-      const btnGroup=document.createElement('div');btnGroup.style.cssText='display:flex;gap:4px;flex-shrink:0';
+      const btnGroup=document.createElement('div');btnGroup.style.cssText='display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end';
+      if(cls.locked){
+        const unlockBtn=document.createElement('button');unlockBtn.textContent='🔓 잠금해제';unlockBtn.className='ssa-btn';
+        unlockBtn.style.cssText+='padding:5px 10px;font-size:11px;background:#1E40AF;color:#fff;border-color:#1E40AF';
+        unlockBtn.addEventListener('click',(e)=>{e.stopPropagation();selectClass(cls.id);unlockActiveClass();});
+        btnGroup.appendChild(unlockBtn);
+      }
       const renameBtn=document.createElement('button');renameBtn.textContent='이름변경';renameBtn.className='ssa-btn';
       renameBtn.style.cssText+='padding:5px 10px;font-size:11px';
       renameBtn.addEventListener('click',(e)=>{e.stopPropagation();renameClass(cls.id);});
